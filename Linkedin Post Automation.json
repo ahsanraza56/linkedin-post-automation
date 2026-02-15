@@ -1,0 +1,306 @@
+{
+  "name": "Linkedin Post Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "LinkedIn Post Creator",
+        "formDescription": "Create engaging LinkedIn posts with AI-generated content and images. Provide your topic/details and optionally upload an image.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Post Topic/Details",
+              "fieldType": "textarea",
+              "fieldName": "topic",
+              "placeholder": "Enter the topic or details for your LinkedIn post...",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Image URL (Optional)",
+              "fieldName": "image_url",
+              "placeholder": "Paste image URL if you have one (leave blank to auto-generate)"
+            },
+            {
+              "fieldLabel": "Post Timing",
+              "fieldType": "dropdown",
+              "fieldName": "schedule_option",
+              "defaultValue": "Post Now",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Post Now"
+                  },
+                  {
+                    "option": "Schedule for Later"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Schedule Date/Time (if scheduling)",
+              "fieldName": "schedule_date",
+              "placeholder": "e.g., 2024-01-15 10:00 AM"
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {
+          "appendAttribution": false,
+          "buttonLabel": "Generate & Post"
+        }
+      },
+      "id": "f04a261b-71d5-4f9f-9ae4-9a0bd29dcc72",
+      "name": "Collect Post Topic",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        240,
+        -160
+      ],
+      "webhookId": "16902bb4-f57a-4c92-a588-0a85f0140b25"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "topic",
+              "value": "={{ $json.topic }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "image_url",
+              "value": "={{ $json.image_url || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "schedule_option",
+              "value": "={{ $json.schedule_option }}",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "schedule_date",
+              "value": "={{ $json.schedule_date || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "id-5",
+              "name": "has_image",
+              "value": "={{ $json.image_url ? true : false }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c6a120da-2e36-4088-b546-77718bc8f93b",
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"post_content\": \"The engaging LinkedIn post text with proper formatting and line breaks\",\n  \"hashtags\": \"#Marketing #Leadership #Innovation\",\n  \"image_description\": \"professional office setting with modern technology\",\n  \"character_count\": 280\n}"
+      },
+      "id": "208c053c-2d3c-4007-8433-9691f67c790f",
+      "name": "Structure Post Output",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        912,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create a compelling LinkedIn post based on this topic/details:\n{{ $('Workflow Configuration').item.json.topic }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a LinkedIn content expert specializing in creating engaging, professional posts that drive engagement. You write in a natural, conversational, human voice and avoid corporate jargon and clichés."
+        }
+      },
+      "id": "e26be098-03ce-4a9a-a110-6de3e4fb17eb",
+      "name": "Generate LinkedIn Post",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        688,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "fd51a313-939f-487c-a5ea-f7a8cce8d652",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        704,
+        64
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "CwC7N0EDc4WWArDL",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "person": "ovr-Kf-v2Q",
+        "text": "={{ $json.output.post_content }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        -160
+      ],
+      "id": "110c9172-e7e2-4bf5-a5ce-09dbfe0da012",
+      "name": "Create a post",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "hLQtLZiOUqkzbLSn",
+          "name": "LinkedIn account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-base-1.0",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer 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"
+            },
+            {
+              "name": "Accept",
+              "value": "image/png"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "inputs",
+              "value": "={{ $('Generate LinkedIn Post').item.json.output.image_description }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1040,
+        -64
+      ],
+      "id": "66905fc6-5d79-433d-a2e1-03eb1825cc4a",
+      "name": "HF Image Generator"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Collect Post Topic": {
+      "main": [
+        [
+          {
+            "node": "Workflow Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Configuration": {
+      "main": [
+        [
+          {
+            "node": "Generate LinkedIn Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structure Post Output": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generate LinkedIn Post",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate LinkedIn Post": {
+      "main": [
+        [
+          {
+            "node": "HF Image Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate LinkedIn Post",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HF Image Generator": {
+      "main": [
+        [
+          {
+            "node": "Create a post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f36fe55c-2902-4a93-a7f7-d6d18a0d2aa4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ae70bdecabd5e4ed27b702228169d6aaae7d5409ad5ca234b9692dffbafa186a"
+  },
+  "id": "JshKEHIpU-rIuLZIZpRQt",
+  "tags": []
+}
