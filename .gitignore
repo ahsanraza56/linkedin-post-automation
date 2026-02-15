@@ -1,0 +1,25 @@
+# General System Files
+.DS_Store
+Thumbs.db
+
+# Environment Variables (CRITICAL)
+# Never commit these as they contain your API keys
+.env
+.env.local
+.env.*
+
+# n8n Local Files (If you are self-hosting in this folder)
+.n8n/
+*.sqlite
+binaryData/
+
+# Node modules (If you add custom JavaScript/TypeScript libraries)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS generated files
+.Spotlight-V100
+.Trashes
+ehthumbs.db
