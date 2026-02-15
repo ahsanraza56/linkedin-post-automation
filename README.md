@@ -3,8 +3,8 @@
 A fully automated workflow built on **n8n** that takes a simple topic, generates engaging content using **Google Gemini**, creates a relevant image using **Hugging Face**, and publishes directly to **LinkedIn**.
 
 ##  workflow Overview
+<img width="714" height="255" alt="image" src="https://github.com/user-attachments/assets/b2e51b3d-86e7-4530-8870-8461fca35334" />
 
-![Workflow Diagram](image.png) **
 
 This tool automates the entire content supply chain:
 1.  **Input:** Accepts a post topic (Manual trigger or Form).
